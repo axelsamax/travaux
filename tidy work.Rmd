@@ -7,7 +7,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+tidy_anime <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-23/tidy_anime.csv")
 
+```
+
+```{r}
+tidy_anime %>% 
+  filter(title_english == "Naruto") 
+```
+
+
+
+```{r}
+anime_scores  <-  tidy_anime %>% 
+  select(animeID, name, popularity, rank, score, favorites, members) 
+```
 
 
 
@@ -23,10 +38,12 @@ anime_scores %>%
   slice(1:20) %>% 
   ggplot(aes(reorder(name, score), score, colour = name)) + 
   geom_point(show.legend = F) + 
-  coord_flip() + 
+  coord_flip() +
   labs(title = "Top 20 Anime en note ",
        x = "",
-       y = "Score de 1 à 10")
+       y = "Score de 1 à 10",
+       caption = "@axelsamax -- Sept 2019")
+       
 ```
 
 
@@ -34,13 +51,15 @@ Quel animé est le plus populaire?
 ```{r}
 anime_scores %>%
   arrange(popularity) %>%
-  slice(1:20) %>%
+  slice(1:20) %>%  
+  distinct() %>% 
   ggplot(aes(reorder(name, -popularity), members, fill = name)) +
   geom_col(show.legend = F) +
   coord_flip() +
-  labs(title = "Top 20 Animé par popularité", 
+  labs(title = "Top 20 Anime par popularité", 
        x = "", 
-       y = "Nombre de fans")
+       y = "nombre de fans")
+  
 ```
 
 ```{r}
@@ -85,6 +104,27 @@ tidy_anime %>%
           panel.background = element_rect(fill = "#edeaf2"),
           axis.text = element_text(colour = "#ffffff", size = 14))
 ```
+
+```{r}
+tidy_anime %>% 
+  select(name, start_date) %>% 
+  distinct()
+```
+
+```{r}
+tidy_anime %>% 
+  separate(col = start_date, into = c("year", "month"), convert = TRUE) -> tidy_year
+```
+
+```{r}
+tidy_year %>% 
+  select(name, year) %>% 
+  group_by(year) %>% 
+  summarise(n = n()) %>% 
+  ggplot(aes(x = year, y = n)+
+           geom_line()
+```
+
 
 
 
