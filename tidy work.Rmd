@@ -71,13 +71,13 @@ anime_scores %>%
   labs(title = "Est ce que popularité siginifie qualité", 
        subtitle = "Top 50 anime basé sur la popularité",
        y = "Nombre de fans",
-       x = "Score de 1 à 10)") + 
+       x = "Score de 1 à 10") + 
   theme(legend.position = 'none')
 ```
 
 
 ```{r}
-df %>%
+tidy_anime %>%
   select(name, type, source,episodes, rating,
          scored_by, rank, popularity, members, favorites) %>%
   
@@ -105,13 +105,13 @@ df %>%
 ```
 
 ```{r}
-df %>% 
+tidy_anime %>% 
   select(name, start_date) %>% 
   distinct()
 ```
 
 ```{r}
-df %>% 
+tidy_anime %>% 
   separate(col = start_date, into = c("year", "month"), convert = TRUE) -> tidy_year
 ```
 
@@ -125,19 +125,24 @@ tidy_year %>%
   geom_text(aes(label = year), check_overlap = T, show.legend = F, size = 3, hjust = 1)+
   coord_flip()+
   theme(legend.position = "none",
-          plot.background = element_rect(fill = "#000000"),
-          plot.subtitle = element_text(colour = "#ffffff", size = 13, hjust = 0.5),
-          plot.caption = element_text(colour = "#ffffff"),
-          panel.background = element_rect(fill = "#edeaf2"),
-          axis.text = element_text(colour = "#ffffff", size = 14))
+          plot.background = element_rect(fill = "blue"),
+          plot.subtitle = element_text(colour = "white", size = 13, hjust = 0.5),
+          plot.caption = element_text(colour = "white"),
+          panel.background = element_rect(fill = "grey"),
+          axis.text = element_text(colour = "white", size = 14))
 
 ```
 
 ```{r}
 tidy_year %>% 
- mutate() %>% 
- geom_text(aes(hjust = 1) )
-
+  select(genre, year) %>%
+  group_by(year) %>% 
+  filter(year == "2018") %>%
+  slice(1:10)
+  ggplot(aes(x = genre, y = year))+
+  geom_point()
+  
+  
 ```
 
 
