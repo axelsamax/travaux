@@ -14,24 +14,24 @@ library(tidyverse)
 ```
 
 ```{r}
-View(tidy_anime)
-```
-
-
-```{r}
 tidy_anime %>%   
   select(animeID, name, popularity, rank, score, favorites, members)
 ```
 
+Introduction:
+Les animés japonnais prennent une place de plus en plus importante chez la jeunesse.En effet, le club dorothée a lancé la mode avec des animés telles que dragon ball ou encore les chevaliers du zodiak en 1987. Ils existent une multitude d'animés, les thèmes et les messages sont variés.
 
 
-Quels sont les 20 meilleurs animés japonnais?
+
+Tout d'abord, nous allons tenter de voir quelles sont les meilleurs animés japonnais par rapport à leur score obtenu.
+
+# Quels sont les 20 meilleurs animés japonnais?
 
 ```{r}
 anime_scores <- tidy_anime %>% 
   select(animeID, name, popularity, rank, score, scored_by, favorites, members) %>% 
   distinct()
-  
+
 anime_scores %>% 
   arrange(rank) %>% 
   slice(1:20) %>% 
@@ -40,111 +40,110 @@ anime_scores %>%
   coord_flip() +
   labs(title = "Top 20 Anime en note ",
        x = "",
-       y = "Score de 1 à 10",
+       y = "Note",
        caption = "@axelsamax -- Sept 2019")
        
 ```
+Nous pouvons voir que l'animé Fullmetal Alchemist Brotherhood est l'animé le mieux noté. En effet, avec une note de 9,24 sur 10.Le vingtième du classement obtient quand même une note de 8,86
 
 
-Quel animé est le plus populaire?
+
+Maintenant, nous allons nous intéresser aux animés ayant la plus popularité, le plus grand nombre de fans.
+
+# Quels sont les animés les plus populaire?
 ```{r}
 anime_scores %>%
   arrange(popularity) %>%
   slice(1:20) %>%  
   distinct() %>% 
-  ggplot(aes(reorder(name, -popularity), members, fill = name)) +
+  ggplot(aes(reorder(name, -popularity), members,fill = name)) +
   geom_col(show.legend = F) +
   coord_flip() +
   labs(title = "Top 20 Anime par popularité", 
        x = "", 
-       y = "nombre de fans")
-  
+       y = "nombre de fans",
+       caption = "@axelsamax -- Sept 2019")+
+  theme(plot.background = element_rect(fill = "blue"),
+        axis.text = element_text(colour = "white", size = 14))
+        
 ```
+Nous pouvons voir que l'animé death note est le plus populaire avec 1 107 955 fans.Nous remarquons aussi que l'animé Fullmetal Alchemist Brotherhood (qui est l'animé le mieux noté) est seulement le 4ème le plus populaire. 
+
+Nous pouvons alors cherché si la qualité fait la popularité dans le monde des animés japonnais.
+
+# Est-ce que la popularité est synonyme de qualité?
 
 ```{r}
 anime_scores %>% 
   filter(popularity <= 50) %>%
-  ggplot(aes(score, scored_by, colour = name)) + 
+  ggplot(aes(score, members, colour = name)) + 
   geom_point() + 
   geom_text(aes(label = name, ), check_overlap = T, show.legend = F, size = 3, hjust = 1) + 
-  xlim(c(6, 10)) +
-  labs(title = "Est ce que popularité siginifie qualité", 
+  xlim(c(7, 9.5)) +
+  labs(title = "Est-ce que popularité signifie qualité ?", 
        subtitle = "Top 50 anime basé sur la popularité",
        y = "Nombre de fans",
-       x = "Score de 1 à 10") + 
-  theme(legend.position = 'none')
+       x = "Score de 7 à 9.5",
+       caption = "@axelsamax -- Sept 2019")+
+  theme(legend.position = 'none',
+          plot.background = element_rect(fill = "green"),
+          plot.subtitle = element_text(colour = "blue", size = 13, hjust = 0.5),
+          axis.text = element_text(colour = "white", size = 14))
+  
 ```
 
+Nous pouvons constarer que la relation entre la popularité et la qualité (note) n'est pas linéaire. Par exemple, l'animé Sword Art Online a l'une des plus grande fan-base de l'étude (1 442 099) alors qu'il a une des moins bonne note (7,58). A l'inverse, l'animé Cowboy Bepop a une des note les plus élevé (8,81) alors que sa fan-base est parmis les plus faible (795733).
 
+
+Nous pouvons nous demander si la quantité fait la qualité. C'est-à-dire si les animés les plus longs, qui contiennent le plus grand nombre d'épisode sont les mieux notés
+
+# Quels sont les animés avec le plus grand nombre d'épisode?
 ```{r}
 tidy_anime %>%
-  select(name, type, source,episodes, rating,
-         scored_by, rank, popularity, members, favorites) %>%
-  
-  ### Extract unique elements  
+  select(name,episodes) %>%
   unique() %>%
-  
-  ### Arrange in descending order and select the first 10 elements
   arrange(desc(episodes)) %>% 
   head(10) %>%
-  
-    ### Plot
     ggplot(aes(x=reorder(name, episodes), y = episodes, fill = name)) +
-    geom_col() +
+    geom_col()+
     coord_flip() +
-    labs(title = "Quelles est l'animé avec le plus grand nombre d'épisode",
-         subtitle = "Top 10", 
+    labs(subtitle = "Top 10", 
          x = "", 
-         y = "Number of episodes") +
+         y = "Nombres d'épisodes",
+         caption = "@axelsamax -- Sept 2019") +
     theme(legend.position = "none",
-          plot.background = element_rect(fill = "#000000"),
-          plot.subtitle = element_text(colour = "#ffffff", size = 13, hjust = 0.5),
-          plot.caption = element_text(colour = "#ffffff"),
-          panel.background = element_rect(fill = "#edeaf2"),
-          axis.text = element_text(colour = "#ffffff", size = 14))
+          plot.background = element_rect(fill = "orange"),
+          plot.subtitle = element_text(colour = "blue", size = 13, hjust = 0.5),
+          panel.background = element_rect(fill = "red"),
+          axis.text = element_text(colour = "purple", size = 14))
 ```
+L'animé Lan Mao est l'animé le plus long avec plus de 3000 épisodesNous constatons qu'aucun des animés trouvés n'a une note élevé ou une fan-base importante.
 
-```{r}
-tidy_anime %>% 
-  select(name, start_date) %>% 
-  distinct()
-```
 
+Nous allons separer la colonne concernant la date de début de l'animé pour avoir une colonne de plus avec seulement l'année
 ```{r}
 tidy_anime %>% 
   separate(col = start_date, into = c("year", "month"), convert = TRUE) -> tidy_year
 ```
 
+Nous allons voir l'évolution de la quantité d'animé à fil des années.
 ```{r}
 tidy_year %>% 
   select(name, year) %>% 
   group_by(year) %>% 
   summarise(n = n()) %>% 
   ggplot(aes(x = year, y = n))+
-  geom_col()+
+  geom_line()+
   geom_text(aes(label = year), check_overlap = T, show.legend = F, size = 3, hjust = 1)+
   coord_flip()+
+  labs(y = "nombre d'animé sortie par an",
+       caption = "@axelsamax -- Sept 2019")+
   theme(legend.position = "none",
           plot.background = element_rect(fill = "blue"),
-          plot.subtitle = element_text(colour = "white", size = 13, hjust = 0.5),
           plot.caption = element_text(colour = "white"),
           panel.background = element_rect(fill = "grey"),
-          axis.text = element_text(colour = "white", size = 14))
-
+          axis.text = element_text(colour = "red", size = 14))
 ```
-
-```{r}
-tidy_year %>% 
-  select(genre, year) %>%
-  group_by(year) %>% 
-  filter(year == "2018") %>%
-  slice(1:10)
-  ggplot(aes(x = genre, y = year))+
-  geom_point()
-  
-  
-```
-
-
+Nous constatons qu'à partir des années 1975, il y a clairememt un pic du nombre d'animé diffusé au Japon. Ce pic a été atteint en 2018, avec 6520 animés.
 
 
